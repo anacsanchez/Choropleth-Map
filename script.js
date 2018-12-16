@@ -7,8 +7,8 @@ const fetchEducation = (countyData) => {
 }
 
 const width = 1000;
-const height = 800;
-const padding = 100;
+const height = 600;
+const padding = 60;
 
 function createChoropleth(educationData, countyData) {
   d3.select("#choropleth")
@@ -60,7 +60,12 @@ function createChoropleth(educationData, countyData) {
             .attr("fill", d => colorScale(eduMap.get(d.id).bachelorsOrHigher))
             .on("mouseover", function(d) {
               tooltip.style("opacity", "1")
+                      .attr("width", 100)
+                      .attr("height", 20)
+                      .style("top",`${d3.mouse(this)[1] - 2}px`)
+                      .style("left",`${d3.mouse(this)[0]}px`)
                       .attr("data-education", eduMap.get(d.id).bachelorsOrHigher)
+                      .html(`${eduMap.get(d.id).area_name} - ${eduMap.get(d.id).bachelorsOrHigher}%`)
             })
             .on("mouseout", function(d) {
               tooltip.style("opacity", "0")
@@ -85,14 +90,15 @@ function createChoropleth(educationData, countyData) {
                               .enter()
                               .append("rect")
                               .attr("height", 20)
-                              .attr("width", 25)
+                              .attr("width", d=> (width/3)/range.length)
                               .attr("fill", d => colorScale(d))
                               .attr("y", 0)
-                              .attr("x", (d,i) => i * 25)
+                              .attr("x", (d,i) => i * (width/3)/range.length)
 
   const colorAxis = d3.axisBottom(eduScale)
 
   legend.append("g")
-        .attr("transform", `translate(0,0)`)
+        .attr("transform", `translate(0,20)`)
         .call(colorAxis)
+  legend.attr("transform", `translate(${padding}, 0)`)
 }

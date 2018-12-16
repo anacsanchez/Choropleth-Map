@@ -5,3 +5,15 @@ body {
 #title {
   text-align: center;
 }
+
+#legend {
+  padding: .5em;
+}
+
+#tooltip {
+  position: absolute;
+  color: black;
+  background-color: lightgray;
+  padding: .2em;
+  border-radius: 2px;
+}
