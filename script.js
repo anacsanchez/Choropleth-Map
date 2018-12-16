@@ -18,6 +18,13 @@ function createChoropleth(educationData, countyData) {
                         .attr("fill", "white")
 
   const path = d3.geoPath()
+  let hash = {}
+  let i = 0;
+
+  while (i < educationData.length) {
+    hash[educationData[i].fips] = educationData[i].bachelorsOrHigher;
+    ++i;
+  }
 
   choropleth.append("g")
             .selectAll("path")
@@ -25,6 +32,8 @@ function createChoropleth(educationData, countyData) {
             .enter()
             .append("path")
             .attr("d", path)
+            .attr("data-fips", d => d.id)
+            .attr("data-education", d => hash[d.id])
             .attr("stroke", "black")
             .attr("class", "county")
 
