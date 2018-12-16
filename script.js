@@ -6,6 +6,10 @@ const fetchEducation = (countyData) => {
   .then(data => createChoropleth(data, countyData))
 }
 
+const width = 1000;
+const height = 800;
+const padding = 100;
+
 function createChoropleth(educationData, countyData) {
   d3.select("#choropleth")
     .append("div")
@@ -13,16 +17,34 @@ function createChoropleth(educationData, countyData) {
 
   const choropleth = d3.select("#choropleth")
                         .append("svg")
-                        .attr("width", 1000)
-                        .attr("height", 800)
+                        .attr("width", width)
+                        .attr("height", height)
                         .attr("fill", "white")
 
   const path = d3.geoPath()
-  let hash = {}
+
+  const tooltip = d3.select("body")
+                    .append("div")
+                    .attr("id", "tooltip")
+                    .style("opacity", "0")
+
+  const minEducation = d3.min(educationData, d => d.bachelorsOrHigher)
+  const maxEducation = d3.max(educationData, d => d.bachelorsOrHigher)
+
+  const range = d3.range(0, 100, 10)
+
+  const colorScale = d3.scaleSequential(d3.interpolateGreens)
+                        .domain([0, maxEducation])
+
+  const eduScale = d3.scaleLinear()
+                      .domain([0, 100])
+                      .range([0, width/3])
+
+  let eduMap = new Map();
   let i = 0;
 
   while (i < educationData.length) {
-    hash[educationData[i].fips] = educationData[i].bachelorsOrHigher;
+    eduMap.set(educationData[i].fips, educationData[i])
     ++i;
   }
 
@@ -33,9 +55,16 @@ function createChoropleth(educationData, countyData) {
             .append("path")
             .attr("d", path)
             .attr("data-fips", d => d.id)
-            .attr("data-education", d => hash[d.id])
-            .attr("stroke", "black")
+            .attr("data-education", d => eduMap.get(d.id).bachelorsOrHigher)
             .attr("class", "county")
+            .attr("fill", d => colorScale(eduMap.get(d.id).bachelorsOrHigher))
+            .on("mouseover", function(d) {
+              tooltip.style("opacity", "1")
+                      .attr("data-education", eduMap.get(d.id).bachelorsOrHigher)
+            })
+            .on("mouseout", function(d) {
+              tooltip.style("opacity", "0")
+            })
 
   choropleth.append("path")
             .datum(topojson.mesh(countyData, countyData.objects.states, function(a,b) {return a !== b}))
@@ -44,4 +73,26 @@ function createChoropleth(educationData, countyData) {
             .attr("stroke-width", "2")
             .attr("d", path)
 
+
+  const legend = d3.select("#choropleth")
+                    .append("svg")
+                    .attr("id", "legend")
+                    .attr("width", width/2)
+                    .attr("height", padding)
+
+  const legendColors = legend.selectAll("rect")
+                              .data(range)
+                              .enter()
+                              .append("rect")
+                              .attr("height", 20)
+                              .attr("width", 25)
+                              .attr("fill", d => colorScale(d))
+                              .attr("y", 0)
+                              .attr("x", (d,i) => i * 25)
+
+  const colorAxis = d3.axisBottom(eduScale)
+
+  legend.append("g")
+        .attr("transform", `translate(0,0)`)
+        .call(colorAxis)
 }
