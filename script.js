@@ -96,6 +96,7 @@ function createChoropleth(educationData, countyData) {
                               .attr("x", (d,i) => i * (width/3)/range.length)
 
   const colorAxis = d3.axisBottom(eduScale)
+  colorAxis.tickFormat(d => `${d}%`)
 
   legend.append("g")
         .attr("transform", `translate(0,20)`)
