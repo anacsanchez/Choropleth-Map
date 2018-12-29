@@ -34,11 +34,11 @@ function createChoropleth(educationData, countyData) {
   const range = d3.range(0, 100, 10)
 
   const colorScale = d3.scaleSequential(d3.interpolateGreens)
-                        .domain([0, maxEducation])
+                        .domain([minEducation, maxEducation])
 
   const eduScale = d3.scaleLinear()
                       .domain([0, 100])
-                      .range([0, width/3])
+                      .range([50, ((range.length+1)*50)])
 
   let eduMap = new Map();
   let i = 0;
@@ -78,11 +78,11 @@ function createChoropleth(educationData, countyData) {
             .attr("stroke-width", "2")
             .attr("d", path)
 
-
+  choropleth.attr('transform', `translate(${padding},0)`)
   const legend = d3.select("#choropleth")
                     .append("svg")
                     .attr("id", "legend")
-                    .attr("width", width/2)
+                    .attr("width", width)
                     .attr("height", padding)
 
   const legendColors = legend.selectAll("rect")
@@ -90,10 +90,10 @@ function createChoropleth(educationData, countyData) {
                               .enter()
                               .append("rect")
                               .attr("height", 20)
-                              .attr("width", d=> (width/3)/range.length)
+                              .attr("width", d=> 50)
                               .attr("fill", d => colorScale(d))
                               .attr("y", 0)
-                              .attr("x", (d,i) => i * (width/3)/range.length)
+                              .attr("x", (d,i) => (i+1) * 50)
 
   const colorAxis = d3.axisBottom(eduScale)
   colorAxis.tickFormat(d => `${d}%`)
@@ -101,5 +101,5 @@ function createChoropleth(educationData, countyData) {
   legend.append("g")
         .attr("transform", `translate(0,20)`)
         .call(colorAxis)
-  legend.attr("transform", `translate(${padding}, 0)`)
+  legend.attr("transform", `translate(${padding*2}, ${padding/2})`)
 }

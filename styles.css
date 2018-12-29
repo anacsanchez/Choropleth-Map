@@ -4,6 +4,8 @@ body {
 
 #title {
   text-align: center;
+  font-size: 1.3em;
+  font-weight: 600;
 }
 
 #legend {
@@ -14,6 +16,7 @@ body {
   position: absolute;
   color: black;
   background-color: white;
-  padding: .2em;
-  border-radius: 2px;
+  padding: .3em .5em;
+  border-radius: 5px;
+  border: 1px solid gray;
 }
